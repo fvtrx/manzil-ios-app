@@ -60,70 +60,17 @@ actor QuranAPIService {
         let translationItem = items.first { $0.edition.identifier == translationEdition }
         let audioItem = items.first { $0.edition.identifier == reciterEdition }
 
-        let cleanedArabic = Self.strippingLeadingBasmala(
-            from: arabicItem.text,
-            surah: arabicItem.surah.number,
-            ayahInSurah: arabicItem.numberInSurah
-        )
-
         let ayah = Ayah(
             reference: reference,
             surahNumber: arabicItem.surah.number,
             numberInSurah: arabicItem.numberInSurah,
-            arabic: cleanedArabic,
+            arabic: arabicItem.text,
             translation: translationItem?.text ?? "",
             audioURL: audioItem?.audio.flatMap(URL.init(string:))
         )
 
         cache[key] = ayah
         return ayah
-    }
-
-    // MARK: - Basmala handling
-
-    /// The Uthmani Arabic edition prepends the Basmala to the first ayah of
-    /// every surah except Al-Fatihah (where it *is* ayah 1) and At-Tawbah
-    /// (which has none). Because the reader shows a decorative Bismillah
-    /// header separately, that prepended copy is a duplicate — so strip it
-    /// from the first ayah of every other surah.
-    ///
-    /// The match is diacritic-insensitive: it compares the first four words
-    /// against the Basmala after removing harakat and normalising alef forms,
-    /// so it works regardless of minor encoding differences and only ever
-    /// removes a genuine leading Basmala.
-    static func strippingLeadingBasmala(from text: String,
-                                        surah: Int,
-                                        ayahInSurah: Int) -> String {
-        guard ayahInSurah == 1, surah != 1, surah != 9 else { return text }
-
-        let words = text.split(whereSeparator: { $0 == " " || $0 == "\u{00A0}" })
-                        .map(String.init)
-        guard words.count > 4 else { return text }
-
-        let firstFour = words.prefix(4).joined()
-        let basmala = "بسم الله الرحمن الرحيم".replacingOccurrences(of: " ", with: "")
-
-        guard normalisedArabic(firstFour) == normalisedArabic(basmala) else { return text }
-        return words.dropFirst(4).joined(separator: " ")
-    }
-
-    /// Removes Arabic diacritics/tatweel and normalises alef variants so two
-    /// spellings of the same word compare equal.
-    private static func normalisedArabic(_ s: String) -> String {
-        var scalars = String.UnicodeScalarView()
-        for scalar in s.unicodeScalars {
-            let v = scalar.value
-            let isMark = (0x064B...0x065F).contains(v)   // harakat / tanwin
-                || v == 0x0670                            // superscript alef
-                || (0x06D6...0x06ED).contains(v)          // small Quranic marks
-                || v == 0x0640                            // tatweel
-            if !isMark { scalars.append(scalar) }
-        }
-        return String(scalars)
-            .replacingOccurrences(of: "ٱ", with: "ا")
-            .replacingOccurrences(of: "أ", with: "ا")
-            .replacingOccurrences(of: "إ", with: "ا")
-            .replacingOccurrences(of: "آ", with: "ا")
     }
 }
 

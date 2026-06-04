@@ -20,7 +20,7 @@ enum QuranData {
                           AyahGroup(256, 257),
                           AyahGroup(284, 286)
                       ],
-                      note: nil),
+                      note: "incl. Ayat al-Kursi"),
 
         ManzilSection(id: 3, surahNumber: 3, surahNameArabic: "آل عمران",
                       titleEnglish: "Ali 'Imran", titleMalay: "Ali 'Imran",
