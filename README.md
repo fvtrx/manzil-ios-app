@@ -5,6 +5,10 @@ passages compiled for protection (*ruqyah*) and healing. Inspired by the
 features of [quran-manzil.com](https://www.quran-manzil.com/) — Arabic text,
 translations, and audio recitation.
 
+|  Home   | Reader View |
+| -------- | ------- |
+| <img width="540" height="1240" alt="Simulator Screenshot - iPhone 17 Pro - 2026-06-04 at 13 34 19" src="https://github.com/user-attachments/assets/643ad189-9d71-4c8d-ad5c-fa00e16764f6" /> | <img width="540" height="1240" alt="Simulator Screenshot - iPhone 17 Pro - 2026-06-04 at 13 34 25" src="https://github.com/user-attachments/assets/067cb53f-f78d-4b70-bde8-8ff6ed20daf8" /> |
+
 ## Features
 
 - **The full Manzil** — all 18 passages (Al-Fatihah, Ayat al-Kursi, Surah
