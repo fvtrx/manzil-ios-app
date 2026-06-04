@@ -139,32 +139,39 @@ struct ReaderView: View {
 
     @ViewBuilder
     private var ayahList: some View {
-        if case .section(let s) = target, s.beginsSurah {
-            BismillahView()
-        }
-
         ForEach(Array(loader.ayahs.enumerated()), id: \.element.id) { index, ayah in
             // In full mode, mark where a new surah starts.
             if case .full = target, isNewSurah(at: index) {
                 surahDivider(for: ayah)
             }
 
-            // In section mode, mark the start of each sub-passage
-            // (e.g. Ayat al-Kursi within Al-Baqarah).
-            if case .section(let s) = target,
-               let heading = s.groupHeading(for: ayah.reference) {
-                groupDivider(heading)
+            // Show the Bismillah at the start of any surah (its first ayah),
+            // in both section and full modes — including Al-Fatihah.
+            if ayah.numberInSurah == 1 {
+                BismillahView()
             }
 
-            AyahCardView(
-                ayah: ayah,
-                isPlaying: player.currentReference == ayah.reference && player.isPlaying,
-                showTranslation: settings.showTranslation,
-                arabicFontSize: settings.arabicFontSize
-            ) {
-                handlePlay(ayah: ayah, index: index)
+            // Al-Fatihah's ayah 1 *is* the Basmala, already shown by the
+            // header above, so don't repeat it as a verse card. Every other
+            // ayah (including Al-Baqarah's 2:1) renders normally.
+            if !(ayah.surahNumber == 1 && ayah.numberInSurah == 1) {
+                // In section mode, mark the start of each sub-passage
+                // (e.g. Ayat al-Kursi within Al-Baqarah).
+                if case .section(let s) = target,
+                   let heading = s.groupHeading(for: ayah.reference) {
+                    groupDivider(heading)
+                }
+
+                AyahCardView(
+                    ayah: ayah,
+                    isPlaying: player.currentReference == ayah.reference && player.isPlaying,
+                    showTranslation: settings.showTranslation,
+                    arabicFontSize: settings.arabicFontSize
+                ) {
+                    handlePlay(ayah: ayah, index: index)
+                }
+                .id(ayah.reference)   // scroll anchor for audio focus
             }
-            .id(ayah.reference)   // scroll anchor for audio focus
         }
     }
 
